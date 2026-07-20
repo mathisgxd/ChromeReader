@@ -1,5 +1,7 @@
 # ChromeReader
 
+![ChromeReader Logo](assets/logo.png)
+
 This package provides access to local Chrome profiles data, including browsing history, bookmarks, and saved login data.
 
 ## Usage

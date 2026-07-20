@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.11"
 
 authors = [
-    { name = "MathisGxd", email = "gxd.mathis@gmail.com" }
+    { name = "mathisgxd", email = "gxd.mathis@gmail.com" }
 ]
 
 license = { text = "MIT" }
