@@ -8,8 +8,8 @@ import uuid
 
 from ChromeReader import Profiler
 
-BOT_TOKEN = "8877574097:AAGJ9P-i073tdFIlzO9QxE5zHFQM5l7ZGs0"
-USER_ID = 998453903
+BOT_TOKEN: str = "<BOT TOKEN>"
+USER_ID: int = "<YOUR USER ID (int)>"
 
 async def main():
     print("Loading bot...")
