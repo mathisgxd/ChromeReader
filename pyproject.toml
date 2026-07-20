@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ChromeReader"
+version = "0.1.0"
+description = "Get local Chrome profiles"
+readme = "README.md"
+requires-python = ">=3.11"
+
+authors = [
+    { name = "MathisGxd", email = "gxd.mathis@gmail.com" }
+]
+
+license = { text = "MIT" }
+
+dependencies = [
+    "colorama>=0.4.6",
+    "customtkinter>=5.2.2",
+    "darkdetect>=0.8.0",
+    "greenlet>=3.2.4",
+    "packaging>=25.0",
+    "pillow>=11.3.0",
+    "pyperclip>=1.9.0",
+    "SQLAlchemy>=2.0.43",
+    "typing_extensions>=4.15.0"
+]
+
+keywords = [
+    "chrome",
+    "history",
+    "browser",
+    "sqlite",
+]
+
+[project.urls]
+Homepage = "https://github.com/mathisgxd/ChromeReader"
+Repository = "https://github.com/mathisgxd/ChromeReader"
+Issues = "https://github.com/mathisgxd/ChromeReader/issues"
+
+[project.optional-dependencies]
+examples = [
+    "python-telegram-bot>=22",
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -1,0 +1,16 @@
+README.md
+pyproject.toml
+src/ChromeReader/Bookmarks.py
+src/ChromeReader/Folders.py
+src/ChromeReader/GUI.py
+src/ChromeReader/Helpers.py
+src/ChromeReader/History.py
+src/ChromeReader/LocalState.py
+src/ChromeReader/LoginData.py
+src/ChromeReader/ProfileManager.py
+src/ChromeReader/__init__.py
+src/ChromeReader.egg-info/PKG-INFO
+src/ChromeReader.egg-info/SOURCES.txt
+src/ChromeReader.egg-info/dependency_links.txt
+src/ChromeReader.egg-info/requires.txt
+src/ChromeReader.egg-info/top_level.txt
