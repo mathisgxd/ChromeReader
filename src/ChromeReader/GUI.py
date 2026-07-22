@@ -9,7 +9,8 @@ import webbrowser
 import pyperclip
 from typing_extensions import Union
 import PIL
-import os
+#import os
+from importlib.resources import files
 
 # Helper functions
 def bookmark_to_frame(master, bookmark: Union[bm.Root, bm.Url, bm.Folder]) -> Union["BookmarksFolderFrame", "BookmarksUrlFrame"]:
@@ -574,7 +575,7 @@ class ChromeReaderApp(ctk.CTk):
         super().__init__()
 
         self.title(f"ChromeReader - {profile.profile_name}")
-        self.iconbitmap(os.path.join(os.path.dirname(os.path.abspath(__file__)), r"AppIcon.ico"))
+        self.iconbitmap(files("ChromeReader").joinpath("AppIcon.ico"))#os.path.join(os.path.dirname(os.path.abspath(__file__)), r"AppIcon.ico"))
         self.geometry("1300x700")
 
         # Profile Frame

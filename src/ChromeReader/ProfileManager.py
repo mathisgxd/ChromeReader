@@ -82,7 +82,7 @@ class Profile(Folders.ProfileFolder, LocalState.Profile):
             warn(f"Failed to get profile picture of Profile {self.name} ({self.profile_name})")
             return None
 
-    def save(self, path: str, make_folder: bool = True, make_visualizer_file: bool = True):
+    def save(self, path: str, make_folder: bool = True):
         if make_folder:
             path = os.path.join(path, self.profile_name or self.name)
 
@@ -90,15 +90,31 @@ class Profile(Folders.ProfileFolder, LocalState.Profile):
         self.copy_all_files(path)
         self.save_as_file(path)
 
-        if make_visualizer_file:
-            with open(os.path.join(path, "Visualize.crv"), "w") as file:
-                file.close()
+        return path
 
     @classmethod
     def load(cls, path: str):
         return cls(path, profile_dict=load_json(os.path.join(path, "ProfileLocalState.json")), profile_name=os.path.split(path)[1])
         
 
+class ProfilerLoader:
+    def __init__(self, path: str):
+        super().__init__(path)
+        self.profiles = self.get_profiles()
+
+    def get_profiles_names(self) -> list[str]:
+        return os.path.listdir(self.path)
+
+    def get_profile(self, profile_name: str = "Default") -> Profile:
+        return Profile.load(os.path.join(self.path, profile_name))
+
+    def get_profiles(self, profile_names: list[str] | None = None) -> list[Profile]:
+        profile_names = profile_names or self.get_profiles_names()
+        profiles = [self.get_profile(profile_name) for profile_name in profile_names]
+
+    def save_profiles(self, path: str):
+        for profile in self.profiles:
+            profile.save(path, make_folder=True)
 
 
 class Profiler(Folders.UserDataFolder, LocalState.LocalStateSession):
@@ -119,6 +135,13 @@ class Profiler(Folders.UserDataFolder, LocalState.LocalStateSession):
     def save_profiles(self, path: str):
         for profile in self.profiles:
             profile.save(path, make_folder=True)
+
+    @classmethod
+    def load_profiles(cls, path: str) -> ProfilerLoader:
+        '''
+        Load saved profiles
+        '''
+        return ProfilerLoader(path)
 
     
     

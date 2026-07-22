@@ -1,4 +1,5 @@
 import ChromeReader
+from customtkinter import filedialog
 
 import os
 import sys
@@ -20,6 +21,6 @@ def open_profile_folder_app(path: str = ""):
     app.mainloop()
 
 if __name__ == "__main__":
-    path = get_file_folder_path() or ""
-    open_profile_folder_app(path)
-    #open_profile_folder_app()
+    path = get_file_folder_path() or os.path.split(filedialog.askopenfilename(title="Select the desired crv file", filetypes=[("File ChromeReaderVisualizer", "*.crv")]))[0]
+    if path is not None:
+        open_profile_folder_app(path)
