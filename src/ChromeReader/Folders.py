@@ -36,6 +36,10 @@ class ProfileFolder:
     def copy_login_data_database(self, path: str, name: str = "Login Data", extension: str = ""):
         '''Copy the Login Data file from this profile folder to a custom path'''
         return self._copy_database("Login Data", path, name, extension)
+
+    def copy_web_data_database(self, path: str, name: str = "Web Data", extension: str = ""):
+        '''Copy the Login Data file from this profile folder to a custom path'''
+        return self._copy_database("Web Data", path, name, extension)
     
     def copy_profile_picture(self, path: str, name: str = "Google Profile Picture", extension: str = "png"):
         '''Copy the Profile Picture.png file from this profile folder to a custom path'''
@@ -46,6 +50,7 @@ class ProfileFolder:
         self.copy_history_database(path)
         self.copy_bookmarks_json(path)
         self.copy_login_data_database(path)
+        self.copy_web_data_database(path)
         self.copy_profile_picture(path)
     
 """ class UserDataFolder:

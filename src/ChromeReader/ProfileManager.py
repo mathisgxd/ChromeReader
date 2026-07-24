@@ -28,6 +28,7 @@ from .Helpers import load_json
 from . import History
 from . import Bookmarks
 from . import LoginData
+from . import WebData
 
 import os
 from warnings import warn
@@ -59,7 +60,7 @@ class Profile(Folders.ProfileFolder, LocalState.Profile):
             return None
         
     @cached_property
-    def bookmarks(self) -> History.HistorySession | None:
+    def bookmarks(self) -> Bookmarks.BookmarksSession | None:
         try:
             return Bookmarks.create_bookmarks_session(os.path.join(self.path, "Bookmarks"))
         except:
@@ -67,15 +68,23 @@ class Profile(Folders.ProfileFolder, LocalState.Profile):
             return None
         
     @cached_property
-    def login_data(self) -> History.HistorySession | None:
+    def login_data(self) -> LoginData.LoginDataSession | None:
         try:
             return LoginData.create_login_data_session(os.path.join(self.path, "Login Data"))
         except:
             warn(f"Failed to get login data of Profile {self.name} ({self.profile_name})")
             return None
+
+    @cached_property
+    def web_data(self) -> WebData.WebDataSession | None:
+        try:
+            return WebData.create_web_data_session(os.path.join(self.path, "Web Data"))
+        except:
+            warn(f"Failed to get bookmarks of Profile {self.name} ({self.profile_name})")
+            return None
         
     @cached_property
-    def profile_picture(self) -> History.HistorySession | None:
+    def profile_picture(self):# -> PIL.Image.Image | None:
         try:
             return PIL.Image.open(os.path.join(self.path, "Google Profile Picture.png"))
         except:
@@ -99,18 +108,18 @@ class Profile(Folders.ProfileFolder, LocalState.Profile):
 
 class ProfilerLoader:
     def __init__(self, path: str):
-        super().__init__(path)
+        self.path = path
         self.profiles = self.get_profiles()
 
     def get_profiles_names(self) -> list[str]:
-        return os.path.listdir(self.path)
+        return os.listdir(self.path)
 
     def get_profile(self, profile_name: str = "Default") -> Profile:
         return Profile.load(os.path.join(self.path, profile_name))
 
     def get_profiles(self, profile_names: list[str] | None = None) -> list[Profile]:
         profile_names = profile_names or self.get_profiles_names()
-        profiles = [self.get_profile(profile_name) for profile_name in profile_names]
+        return [self.get_profile(profile_name) for profile_name in profile_names]
 
     def save_profiles(self, path: str):
         for profile in self.profiles:
