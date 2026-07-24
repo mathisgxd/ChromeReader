@@ -45,5 +45,5 @@ app.mainloop()
 ## Installing
 
 ```
-pip install ChromeReader
+pip install git+https://github.com/mathisgxd/ChromeReader.git
 ```
