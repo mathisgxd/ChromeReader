@@ -4,7 +4,7 @@ import sqlalchemy as sa # For SQL
 import sqlalchemy.orm as orm # For object workflow
 from sqlalchemy.ext.hybrid import hybrid_property # To add properties
 
-from typing_extensions import Literal, List
+from typing_extensions import Literal, List, Union
 
 
 Base = orm.declarative_base()
@@ -205,6 +205,14 @@ class WebDataSession(orm.Session):
 
     def search_address_type_tokens(self, query: str, mode: Literal["any", "all", "exact"] = "any", case_sensitive: bool = False):
         return self.search(AddressTypeToken, [AddressTypeToken.value], query, mode, case_sensitive)
+
+    def search_all(self, query: str, mode: Literal["any", "all", "exact"] = "any", case_sensitive: bool = False) -> list[Union[MaskedCreditCard, AddressTypeToken, Autofill]]:
+        results = []
+
+        for s in (self.search_masked_credit_cards, self.search_address_type_tokens, self.search_autofills):
+            results += s(query, mode, case_sensitive)
+
+        return results
     
 
 

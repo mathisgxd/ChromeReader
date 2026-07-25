@@ -34,6 +34,7 @@ import os
 from warnings import warn
 from functools import cached_property
 import PIL
+from typing_extensions import Literal, Union
 
 class Profile(Folders.ProfileFolder, LocalState.Profile):
     '''
@@ -90,6 +91,14 @@ class Profile(Folders.ProfileFolder, LocalState.Profile):
         except:
             warn(f"Failed to get profile picture of Profile {self.name} ({self.profile_name})")
             return None
+
+    def search_all(self, query: str, mode: Literal["any", "all", "exact"] = "any", case_sensitive: bool = False) -> list[Union[History.Url, History.Visit, History.Download, WebData.MaskedCreditCard, WebData.AddressTypeToken, WebData.Autofill, Bookmarks.Url, LoginData.Login]]:
+        results = []
+
+        for s in (self.history.search_all, self.web_data.search_all, self.login_data.search_logins, self.bookmarks.search_bookmarks):
+            results += s(query, mode, case_sensitive)
+
+        return results
 
     def save(self, path: str, make_folder: bool = True):
         if make_folder:

@@ -4,7 +4,7 @@ import sqlalchemy as sa # For SQL
 import sqlalchemy.orm as orm # For object workflow
 from sqlalchemy.ext.hybrid import hybrid_property # To add properties
 
-from typing_extensions import Literal, List
+from typing_extensions import Literal, List, Union
 
 
 Base = orm.declarative_base()
@@ -224,6 +224,14 @@ class HistorySession(orm.Session):
 
     def search_downloads(self, query: str, mode: Literal["any", "all", "exact"] = "any", case_sensitive: bool = False):
         return self.search(Download, [Download.target_path, Download.tab_url], query, mode, case_sensitive)
+
+    def search_all(self, query: str, mode: Literal["any", "all", "exact"] = "any", case_sensitive: bool = False) -> list[Union[Url, Visit, Download]]:
+        results = []
+
+        for s in (self.search_urls, self.search_visits, self.search_downloads):
+            results += s(query, mode, case_sensitive)
+
+        return results
     
 
 
