@@ -3,6 +3,7 @@ from . import History as h
 from . import Bookmarks as bm
 from . import LoginData as lg
 from . import LocalState as ls
+from . import WebData as wd
 from . import ProfileManager
 
 import webbrowser
@@ -567,6 +568,51 @@ class LocalStateProfileFrame(ctk.CTkFrame):
 
         profile_data_frame.pack(side=ctk.LEFT, fill=ctk.X, pady=10, expand=True)
 
+class WebDataAutofillFrame(ctk.CTkFrame):
+    def __init__(self, master, autofill: wd.Autofill, **kwargs):
+        super().__init__(master, **kwargs)
+
+        self.autofill = autofill
+
+        label = ctk.CTkLabel(self,
+                            text=f"{autofill.name}: ",
+                            font=BigFont(),
+                            fg_color="transparent")
+        label.pack(fill=ctk.X, side=ctk.LEFT)
+
+        entry = ctk.CTkEntry(self,
+                            font=BigFont(),)
+                            #fg_color="dark green",
+                            #border_color="green")
+        entry.insert(0, self.autofill.value)
+        entry.configure(state="readonly")
+        entry.pack(side=ctk.RIGHT, fill=ctk.X)#, expand=True)
+
+
+class WebDataFrame(ctk.CTkFrame):
+    def __init__(self, master, web_data_session: wd.WebDataSession, **kwargs):
+        super().__init__(master, **kwargs)
+
+        self.web_data_session = web_data_session
+
+        search_bar = SearchBar(self, self.search, self.end_search)
+        search_bar.pack(fill=ctk.X, pady=2)
+
+        autofills = self.web_data_session.autofills
+        self.autofills_list = BaseScrollableList(self, autofills, WebDataAutofillFrame)
+        self.autofills_list.pack(fill=ctk.BOTH, expand=True)
+
+    def search(self, query: str):
+        autofills = self.web_data_session.search_autofills(query)
+        self.autofills_list.pack_elements(autofills)
+
+    def end_search(self):
+        autofills = self.web_data_session.autofills
+        self.autofills_list.pack_elements(autofills)
+
+
+
+
 # Apps
 
 
@@ -576,7 +622,7 @@ class ChromeReaderApp(ctk.CTk):
 
         self.title(f"ChromeReader - {profile.profile_name}")
         self.iconbitmap(files("ChromeReader").joinpath("AppIcon.ico"))#os.path.join(os.path.dirname(os.path.abspath(__file__)), r"AppIcon.ico"))
-        self.geometry("1300x700")
+        self.geometry("1920x1080")
 
         # Profile Frame
         profile_frame = LocalStateProfileFrame(self, profile, profile.profile_picture or PIL.Image.open("default_pfp.png"))
@@ -594,6 +640,18 @@ class ChromeReaderApp(ctk.CTk):
         hf.pack(fill=ctk.BOTH, expand=True)
         urls_frame.pack(side=ctk.LEFT, fill=ctk.BOTH, expand=True)
 
+        # Logins Frame
+        logins_frame = ctk.CTkFrame(self)
+        logins_label = ctk.CTkLabel(logins_frame,
+                                text=f"LOGINS ({len(profile.login_data.logins)})",
+                                font=BigFont())
+        logins_label.pack(fill=ctk.X)
+
+        print("loading logins...")
+        lsf = LoginsFrame(logins_frame, profile.login_data)
+        lsf.pack(fill=ctk.BOTH, expand=True)
+        logins_frame.pack(side=ctk.LEFT, fill=ctk.BOTH, expand=True)
+
         # Bookmarks Frame
         bookmarks_frame = ctk.CTkFrame(self)
         bookmarks_label = ctk.CTkLabel(bookmarks_frame,
@@ -604,18 +662,19 @@ class ChromeReaderApp(ctk.CTk):
         print("loading bookmarks...")
         bf = BookmarksFrame(bookmarks_frame, profile.bookmarks)
         bf.pack(fill=ctk.BOTH, expand=True)
-        bookmarks_frame.pack(side=ctk.RIGHT, fill=ctk.BOTH, expand=True)
+        bookmarks_frame.pack(side=ctk.LEFT, fill=ctk.BOTH, expand=True)
 
-        # Logins Frame
-        logins_frame = ctk.CTkFrame(self)
-        logins_label = ctk.CTkLabel(logins_frame,
-                                text=f"LOGINS ({len(profile.login_data.logins)})",
+        # Web Data Autofills Frame
+        autofills_frame = ctk.CTkFrame(self)
+        autofills_label = ctk.CTkLabel(autofills_frame,
+                                text=f"AUTOFILLS ({len(profile.web_data.autofills)})",
                                 font=BigFont())
-        logins_label.pack(fill=ctk.X)
-        print("loading logins...")
-        lsf = LoginsFrame(logins_frame, profile.login_data)
-        lsf.pack(fill=ctk.BOTH, expand=True)
-        logins_frame.pack(side=ctk.RIGHT, fill=ctk.BOTH, expand=True)
+        autofills_label.pack(fill=ctk.X)
+        
+        print("loading web data...")
+        wdf = WebDataFrame(autofills_frame, profile.web_data)
+        wdf.pack(fill=ctk.BOTH, expand=True)
+        autofills_frame.pack(side=ctk.RIGHT, fill=ctk.BOTH, expand=True)
 
 # Testing
 if __name__ == "__main__":
