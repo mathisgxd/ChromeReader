@@ -331,10 +331,10 @@ class SearchBar(ctk.CTkFrame):
         self.search_command = search_command
         self.end_search_command = end_search_command
 
-        self.entry = ctk.CTkEntry(self, placeholder_text="Search...")
+        self.entry = ctk.CTkEntry(self, placeholder_text="Search...", font=MidFont())
         self.entry.pack(fill=ctk.X, side=ctk.LEFT, expand=True)
 
-        self.button = ctk.CTkButton(self, text="⌕", command=self.button_pressed, width=35)
+        self.button = ctk.CTkButton(self, text="⌕", command=self.button_pressed, width=35, font=MidFont())
         self.button.pack(side=ctk.LEFT)
 
         self.searching: bool = False
@@ -371,12 +371,15 @@ class BaseScrollableList(ctk.CTkScrollableFrame):
         if pack_all:
             self.pack_elements(self.elements_frames.keys())
 
-    def pack_elements(self, elements: list):
+    def pack_elements(self, elements: list, scroll_to_top: bool = True):
         self.elements_frames = self.elements_frames | {element: self.t(self, element) for element in elements if element not in self.elements_frames.keys()}
 
         for frame in self.elements_frames.values():
             if frame is not None and frame.winfo_ismapped():
                 frame.pack_forget()
+
+        if scroll_to_top:
+            self._parent_canvas.yview_moveto(0.0)
 
         for element in elements:
             if (frame := self.elements_frames[element]) is None:
@@ -581,12 +584,49 @@ class WebDataAutofillFrame(ctk.CTkFrame):
         label.pack(fill=ctk.X, side=ctk.LEFT)
 
         entry = ctk.CTkEntry(self,
-                            font=BigFont(),)
+                            font=BigFont(),
+                            width=300)
                             #fg_color="dark green",
                             #border_color="green")
         entry.insert(0, self.autofill.value)
         entry.configure(state="readonly")
         entry.pack(side=ctk.RIGHT, fill=ctk.X)#, expand=True)
+
+class WebDataCardFrame(ctk.CTkFrame):
+    def __init__(self, master, masked_credit_card: wd.MaskedCreditCard, **kwargs):
+        super().__init__(master, fg_color="dark orange", **kwargs)
+
+        self.masked_credit_card = masked_credit_card
+
+        label = ctk.CTkLabel(self,
+                            text=f"{masked_credit_card.nickname or "No name"} ({masked_credit_card.last_four})",
+                            font=BigFont(),
+                            text_color="black",
+                            fg_color="orange")
+        label.pack(fill=ctk.X)
+
+        info_lines = [f"Name on card: {self.masked_credit_card.name_on_card}",
+                      f"Expires: {self.masked_credit_card.exp_date.strftime("%Y-%m")}"]
+        
+        if self.masked_credit_card.network:
+            info_lines.append(f"Network: {self.masked_credit_card.network}")
+
+        if self.masked_credit_card.bank_name:
+            info_lines.append(f"Bank name: {self.masked_credit_card.bank_name}")
+
+        if self.masked_credit_card.card_issuer_id:
+            info_lines.append(f"Card issuer: {self.masked_credit_card.card_issuer_id}")
+
+        if self.masked_credit_card.product_description:
+            info_lines.append(f"Description: {self.masked_credit_card.product_description}")
+
+        self.info_label = ctk.CTkLabel(self,
+                                        text="\n".join(info_lines),
+                                        font=MidFont(),
+                                        text_color="black",
+                                        fg_color="transparent",
+                                        justify=ctk.LEFT)
+        self.info_label.pack(pady=5)
 
 
 class WebDataFrame(ctk.CTkFrame):
@@ -610,6 +650,27 @@ class WebDataFrame(ctk.CTkFrame):
         autofills = self.web_data_session.autofills
         self.autofills_list.pack_elements(autofills)
 
+class WebDataCardsFrame(ctk.CTkFrame):
+    def __init__(self, master, web_data_session: wd.WebDataSession, **kwargs):
+        super().__init__(master, **kwargs)
+
+        self.web_data_session = web_data_session
+
+        search_bar = SearchBar(self, self.search, self.end_search)
+        search_bar.pack(fill=ctk.X, pady=2)
+
+        masked_credit_cards = self.web_data_session.masked_credit_cards
+        self.masked_credit_cards_list = BaseScrollableList(self, masked_credit_cards, WebDataCardFrame)
+        self.masked_credit_cards_list.pack(fill=ctk.BOTH, expand=True)
+
+    def search(self, query: str):
+        masked_credit_cards = self.web_data_session.search_masked_credit_cards(query)
+        self.masked_credit_cards_list.pack_elements(masked_credit_cards)
+
+    def end_search(self):
+        masked_credit_cards = self.web_data_session.masked_credit_cards
+        self.masked_credit_cards_list.pack_elements(masked_credit_cards)
+
 
 
 
@@ -628,10 +689,13 @@ class ChromeReaderApp(ctk.CTk):
         profile_frame = LocalStateProfileFrame(self, profile, profile.profile_picture or PIL.Image.open("default_pfp.png"))
         profile_frame.pack(fill=ctk.X)
 
+        # Top row (HISTORY URLS, LOGINS and BOOKMARKS)
+        top_row = ctk.CTkFrame(self)
+
         # History URLs Frame
-        urls_frame = ctk.CTkFrame(self)
+        urls_frame = ctk.CTkFrame(top_row)
         urls_label = ctk.CTkLabel(urls_frame,
-                                text=f"HISTORY URLS ({len(profile.history.urls)})",
+                                text=f"🗃️ HISTORY URLS ({len(profile.history.urls)})",
                                 font=BigFont())
         urls_label.pack(fill=ctk.X)
 
@@ -641,9 +705,9 @@ class ChromeReaderApp(ctk.CTk):
         urls_frame.pack(side=ctk.LEFT, fill=ctk.BOTH, expand=True)
 
         # Logins Frame
-        logins_frame = ctk.CTkFrame(self)
+        logins_frame = ctk.CTkFrame(top_row)
         logins_label = ctk.CTkLabel(logins_frame,
-                                text=f"LOGINS ({len(profile.login_data.logins)})",
+                                text=f"🗝️ LOGINS ({len(profile.login_data.logins)})",
                                 font=BigFont())
         logins_label.pack(fill=ctk.X)
 
@@ -653,9 +717,9 @@ class ChromeReaderApp(ctk.CTk):
         logins_frame.pack(side=ctk.LEFT, fill=ctk.BOTH, expand=True)
 
         # Bookmarks Frame
-        bookmarks_frame = ctk.CTkFrame(self)
+        bookmarks_frame = ctk.CTkFrame(top_row)
         bookmarks_label = ctk.CTkLabel(bookmarks_frame,
-                                    text=f"BOOKMARKS",
+                                    text=f"⭐ BOOKMARKS",
                                     font=BigFont())
         bookmarks_label.pack(fill=ctk.X)
 
@@ -664,10 +728,15 @@ class ChromeReaderApp(ctk.CTk):
         bf.pack(fill=ctk.BOTH, expand=True)
         bookmarks_frame.pack(side=ctk.LEFT, fill=ctk.BOTH, expand=True)
 
+        top_row.pack(fill=ctk.BOTH, expand=True)
+
+        # Bottom row (AUTOFILLS and CREDIT CARDS)
+        bottom_row = ctk.CTkFrame(self)
+
         # Web Data Autofills Frame
-        autofills_frame = ctk.CTkFrame(self)
+        autofills_frame = ctk.CTkFrame(bottom_row)
         autofills_label = ctk.CTkLabel(autofills_frame,
-                                text=f"AUTOFILLS ({len(profile.web_data.autofills)})",
+                                text=f"📝 AUTOFILLS ({len(profile.web_data.autofills)})",
                                 font=BigFont())
         autofills_label.pack(fill=ctk.X)
         
@@ -675,6 +744,20 @@ class ChromeReaderApp(ctk.CTk):
         wdf = WebDataFrame(autofills_frame, profile.web_data)
         wdf.pack(fill=ctk.BOTH, expand=True)
         autofills_frame.pack(side=ctk.RIGHT, fill=ctk.BOTH, expand=True)
+
+        # Web Data Cards Frame
+        cards_frame = ctk.CTkFrame(bottom_row)
+        cards_label = ctk.CTkLabel(cards_frame,
+                                text=f"💳 CREDIT CARDS ({len(profile.web_data.masked_credit_cards)})",
+                                font=BigFont())
+        cards_label.pack(fill=ctk.X)
+        
+        #print("loading web data cards...")
+        wdcf = WebDataCardsFrame(cards_frame, profile.web_data)
+        wdcf.pack(fill=ctk.BOTH, expand=True)
+        cards_frame.pack(side=ctk.RIGHT, fill=ctk.BOTH, expand=True)
+
+        bottom_row.pack(fill=ctk.BOTH, expand=True)
 
 # Testing
 if __name__ == "__main__":

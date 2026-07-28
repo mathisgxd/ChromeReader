@@ -111,14 +111,14 @@ class Profile(Folders.ProfileFolder, LocalState.Profile):
         return path
 
     @classmethod
-    def load(cls, path: str):
+    def load(cls, path: str) -> "Profile":
         return cls(path, profile_dict=load_json(os.path.join(path, "ProfileLocalState.json")), profile_name=os.path.split(path)[1])
         
 
 class ProfilerLoader:
     def __init__(self, path: str):
         self.path = path
-        self.profiles = self.get_profiles()
+        self.profiles: list[Profile] = self.get_profiles()
 
     def get_profiles_names(self) -> list[str]:
         return os.listdir(self.path)
