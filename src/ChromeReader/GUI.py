@@ -12,6 +12,7 @@ from typing_extensions import Union
 import PIL
 #import os
 from importlib.resources import files
+from warnings import warn
 
 # Helper functions
 def bookmark_to_frame(master, bookmark: Union[bm.Root, bm.Url, bm.Folder]) -> Union["BookmarksFolderFrame", "BookmarksUrlFrame"]:
@@ -693,40 +694,49 @@ class ChromeReaderApp(ctk.CTk):
         top_row = ctk.CTkFrame(self)
 
         # History URLs Frame
-        urls_frame = ctk.CTkFrame(top_row)
-        urls_label = ctk.CTkLabel(urls_frame,
-                                text=f"🗃️ HISTORY URLS ({len(profile.history.urls)})",
-                                font=BigFont())
-        urls_label.pack(fill=ctk.X)
+        try:
+            urls_frame = ctk.CTkFrame(top_row)
+            urls_label = ctk.CTkLabel(urls_frame,
+                                    text=f"🗃️ HISTORY URLS ({len(profile.history.urls)})",
+                                    font=BigFont())
+            urls_label.pack(fill=ctk.X)
 
-        print("loading history...")
-        hf = HistoryFrame(urls_frame, profile.history)
-        hf.pack(fill=ctk.BOTH, expand=True)
-        urls_frame.pack(side=ctk.LEFT, fill=ctk.BOTH, expand=True)
+            print("loading history...")
+            hf = HistoryFrame(urls_frame, profile.history)
+            hf.pack(fill=ctk.BOTH, expand=True)
+            urls_frame.pack(side=ctk.LEFT, fill=ctk.BOTH, expand=True)
+        except:
+            warn("HISTORY URLS frame failed")
 
         # Logins Frame
-        logins_frame = ctk.CTkFrame(top_row)
-        logins_label = ctk.CTkLabel(logins_frame,
-                                text=f"🗝️ LOGINS ({len(profile.login_data.logins)})",
-                                font=BigFont())
-        logins_label.pack(fill=ctk.X)
+        try:
+            logins_frame = ctk.CTkFrame(top_row)
+            logins_label = ctk.CTkLabel(logins_frame,
+                                    text=f"🗝️ LOGINS ({len(profile.login_data.logins)})",
+                                    font=BigFont())
+            logins_label.pack(fill=ctk.X)
 
-        print("loading logins...")
-        lsf = LoginsFrame(logins_frame, profile.login_data)
-        lsf.pack(fill=ctk.BOTH, expand=True)
-        logins_frame.pack(side=ctk.LEFT, fill=ctk.BOTH, expand=True)
+            print("loading logins...")
+            lsf = LoginsFrame(logins_frame, profile.login_data)
+            lsf.pack(fill=ctk.BOTH, expand=True)
+            logins_frame.pack(side=ctk.LEFT, fill=ctk.BOTH, expand=True)
+        except:
+            warn("LOGINS frame failed")
 
         # Bookmarks Frame
-        bookmarks_frame = ctk.CTkFrame(top_row)
-        bookmarks_label = ctk.CTkLabel(bookmarks_frame,
-                                    text=f"⭐ BOOKMARKS",
-                                    font=BigFont())
-        bookmarks_label.pack(fill=ctk.X)
+        try:
+            bookmarks_frame = ctk.CTkFrame(top_row)
+            bookmarks_label = ctk.CTkLabel(bookmarks_frame,
+                                        text=f"⭐ BOOKMARKS",
+                                        font=BigFont())
+            bookmarks_label.pack(fill=ctk.X)
 
-        print("loading bookmarks...")
-        bf = BookmarksFrame(bookmarks_frame, profile.bookmarks)
-        bf.pack(fill=ctk.BOTH, expand=True)
-        bookmarks_frame.pack(side=ctk.LEFT, fill=ctk.BOTH, expand=True)
+            print("loading bookmarks...")
+            bf = BookmarksFrame(bookmarks_frame, profile.bookmarks)
+            bf.pack(fill=ctk.BOTH, expand=True)
+            bookmarks_frame.pack(side=ctk.LEFT, fill=ctk.BOTH, expand=True)
+        except:
+            warn("BOOKMARKS frame failed")
 
         top_row.pack(fill=ctk.BOTH, expand=True)
 
@@ -734,28 +744,34 @@ class ChromeReaderApp(ctk.CTk):
         bottom_row = ctk.CTkFrame(self)
 
         # Web Data Autofills Frame
-        autofills_frame = ctk.CTkFrame(bottom_row)
-        autofills_label = ctk.CTkLabel(autofills_frame,
-                                text=f"📝 AUTOFILLS ({len(profile.web_data.autofills)})",
-                                font=BigFont())
-        autofills_label.pack(fill=ctk.X)
-        
-        print("loading web data...")
-        wdf = WebDataFrame(autofills_frame, profile.web_data)
-        wdf.pack(fill=ctk.BOTH, expand=True)
-        autofills_frame.pack(side=ctk.RIGHT, fill=ctk.BOTH, expand=True)
+        try:
+            autofills_frame = ctk.CTkFrame(bottom_row)
+            autofills_label = ctk.CTkLabel(autofills_frame,
+                                    text=f"📝 AUTOFILLS ({len(profile.web_data.autofills)})",
+                                    font=BigFont())
+            autofills_label.pack(fill=ctk.X)
+            
+            print("loading web data...")
+            wdf = WebDataFrame(autofills_frame, profile.web_data)
+            wdf.pack(fill=ctk.BOTH, expand=True)
+            autofills_frame.pack(side=ctk.LEFT, fill=ctk.BOTH, expand=True)
+        except:
+            warn("AUTOFILLS frame failed")
 
         # Web Data Cards Frame
-        cards_frame = ctk.CTkFrame(bottom_row)
-        cards_label = ctk.CTkLabel(cards_frame,
-                                text=f"💳 CREDIT CARDS ({len(profile.web_data.masked_credit_cards)})",
-                                font=BigFont())
-        cards_label.pack(fill=ctk.X)
-        
-        #print("loading web data cards...")
-        wdcf = WebDataCardsFrame(cards_frame, profile.web_data)
-        wdcf.pack(fill=ctk.BOTH, expand=True)
-        cards_frame.pack(side=ctk.RIGHT, fill=ctk.BOTH, expand=True)
+        try:
+            cards_frame = ctk.CTkFrame(bottom_row)
+            cards_label = ctk.CTkLabel(cards_frame,
+                                    text=f"💳 CREDIT CARDS ({len(profile.web_data.masked_credit_cards)})",
+                                    font=BigFont())
+            cards_label.pack(fill=ctk.X)
+            
+            #print("loading web data cards...")
+            wdcf = WebDataCardsFrame(cards_frame, profile.web_data)
+            wdcf.pack(fill=ctk.BOTH, expand=True)
+            cards_frame.pack(side=ctk.RIGHT, fill=ctk.BOTH, expand=True)
+        except:
+            warn("CREDIT CARDS frame failed")
 
         bottom_row.pack(fill=ctk.BOTH, expand=True)
 
