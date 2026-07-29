@@ -41,6 +41,7 @@ app = ChromeReaderApp(profile) # CTk app to visualize a profile
 app.mainloop()
 ```
 
+![ChromeReader Screenshot](assets/screenshot.png)
 
 ## Installing
 
