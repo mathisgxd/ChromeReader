@@ -332,7 +332,7 @@ class SearchBar(ctk.CTkFrame):
         self.search_command = search_command
         self.end_search_command = end_search_command
 
-        self.entry = ctk.CTkEntry(self, placeholder_text="Search...", font=MidFont())
+        self.entry = ctk.CTkEntry(self, placeholder_text="Search...", font=MidFont(), fg_color="#2B2B2B")
         self.entry.pack(fill=ctk.X, side=ctk.LEFT, expand=True)
 
         self.button = ctk.CTkButton(self, text="⌕", command=self.button_pressed, width=35, font=MidFont())
@@ -364,7 +364,7 @@ class SearchBar(ctk.CTkFrame):
 
 class BaseScrollableList(ctk.CTkScrollableFrame):
     def __init__(self, master, elements: list, t: type, pack_all: bool = True, **kwargs):
-        super().__init__(master, **kwargs)
+        super().__init__(master, fg_color="#1A1A1A", **kwargs)
 
         self.t = t
         self.elements_frames = {element: None for element in elements}
@@ -553,7 +553,7 @@ class LocalStateProfileFrame(ctk.CTkFrame):
                                              image=ctk.CTkImage(self.profile_picture, size=(150, 150)))
         profile_picture_label.pack(side=ctk.LEFT, padx=10, pady=10)#, expand=True)
 
-        profile_data_frame = ctk.CTkFrame(self)
+        profile_data_frame = ctk.CTkFrame(self, fg_color="#1A1A1A")
 
         profile_name_label = ctk.CTkLabel(profile_data_frame,
                                           text=self.profile.name,
@@ -680,22 +680,22 @@ class WebDataCardsFrame(ctk.CTkFrame):
 
 class ChromeReaderApp(ctk.CTk):
     def __init__(self, profile: ProfileManager.Profile):
-        super().__init__()
+        super().__init__(fg_color="#080808")
 
         self.title(f"ChromeReader - {profile.profile_name}")
         self.iconbitmap(files("ChromeReader").joinpath("AppIcon.ico"))#os.path.join(os.path.dirname(os.path.abspath(__file__)), r"AppIcon.ico"))
         self.geometry("1920x1080")
 
         # Profile Frame
-        profile_frame = LocalStateProfileFrame(self, profile, profile.profile_picture or PIL.Image.open("default_pfp.png"))
+        profile_frame = LocalStateProfileFrame(self, profile, profile.profile_picture or PIL.Image.open("default_pfp.png"), fg_color="transparent")#"#1A1A1A")
         profile_frame.pack(fill=ctk.X)
 
-        # Top row (HISTORY URLS, LOGINS and BOOKMARKS)
-        top_row = ctk.CTkFrame(self)
+        # Top row (HISTORY URLS and LOGINS)
+        top_row = ctk.CTkFrame(self, fg_color="#1A1A1A")
 
         # History URLs Frame
         try:
-            urls_frame = ctk.CTkFrame(top_row)
+            urls_frame = ctk.CTkFrame(top_row, fg_color="transparent")
             urls_label = ctk.CTkLabel(urls_frame,
                                     text=f"🗃️ HISTORY URLS ({len(profile.history.urls)})",
                                     font=BigFont())
@@ -710,7 +710,7 @@ class ChromeReaderApp(ctk.CTk):
 
         # Logins Frame
         try:
-            logins_frame = ctk.CTkFrame(top_row)
+            logins_frame = ctk.CTkFrame(top_row, fg_color="transparent")
             logins_label = ctk.CTkLabel(logins_frame,
                                     text=f"🗝️ LOGINS ({len(profile.login_data.logins)})",
                                     font=BigFont())
@@ -723,29 +723,14 @@ class ChromeReaderApp(ctk.CTk):
         except:
             warn("LOGINS frame failed")
 
-        # Bookmarks Frame
-        try:
-            bookmarks_frame = ctk.CTkFrame(top_row)
-            bookmarks_label = ctk.CTkLabel(bookmarks_frame,
-                                        text=f"⭐ BOOKMARKS",
-                                        font=BigFont())
-            bookmarks_label.pack(fill=ctk.X)
-
-            print("loading bookmarks...")
-            bf = BookmarksFrame(bookmarks_frame, profile.bookmarks)
-            bf.pack(fill=ctk.BOTH, expand=True)
-            bookmarks_frame.pack(side=ctk.LEFT, fill=ctk.BOTH, expand=True)
-        except:
-            warn("BOOKMARKS frame failed")
-
         top_row.pack(fill=ctk.BOTH, expand=True)
 
-        # Bottom row (AUTOFILLS and CREDIT CARDS)
-        bottom_row = ctk.CTkFrame(self)
+        # Bottom row (AUTOFILLS, CREDIT CARDS and BOOKMARKS)
+        bottom_row = ctk.CTkFrame(self, fg_color="#1A1A1A")
 
         # Web Data Autofills Frame
         try:
-            autofills_frame = ctk.CTkFrame(bottom_row)
+            autofills_frame = ctk.CTkFrame(bottom_row, fg_color="transparent")
             autofills_label = ctk.CTkLabel(autofills_frame,
                                     text=f"📝 AUTOFILLS ({len(profile.web_data.autofills)})",
                                     font=BigFont())
@@ -760,7 +745,7 @@ class ChromeReaderApp(ctk.CTk):
 
         # Web Data Cards Frame
         try:
-            cards_frame = ctk.CTkFrame(bottom_row)
+            cards_frame = ctk.CTkFrame(bottom_row, fg_color="transparent")
             cards_label = ctk.CTkLabel(cards_frame,
                                     text=f"💳 CREDIT CARDS ({len(profile.web_data.masked_credit_cards)})",
                                     font=BigFont())
@@ -769,9 +754,24 @@ class ChromeReaderApp(ctk.CTk):
             #print("loading web data cards...")
             wdcf = WebDataCardsFrame(cards_frame, profile.web_data)
             wdcf.pack(fill=ctk.BOTH, expand=True)
-            cards_frame.pack(side=ctk.RIGHT, fill=ctk.BOTH, expand=True)
+            cards_frame.pack(side=ctk.LEFT, fill=ctk.BOTH, expand=True)
         except:
             warn("CREDIT CARDS frame failed")
+
+        # Bookmarks Frame
+        try:
+            bookmarks_frame = ctk.CTkFrame(bottom_row, fg_color="transparent")
+            bookmarks_label = ctk.CTkLabel(bookmarks_frame,
+                                        text=f"⭐ BOOKMARKS",
+                                        font=BigFont())
+            bookmarks_label.pack(fill=ctk.X)
+
+            print("loading bookmarks...")
+            bf = BookmarksFrame(bookmarks_frame, profile.bookmarks)
+            bf.pack(fill=ctk.BOTH, expand=True)
+            bookmarks_frame.pack(side=ctk.RIGHT, fill=ctk.BOTH, expand=True)
+        except:
+            warn("BOOKMARKS frame failed")
 
         bottom_row.pack(fill=ctk.BOTH, expand=True)
 
