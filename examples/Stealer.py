@@ -21,7 +21,7 @@ class Profiler(ChromeReader.Profiler):
         for profile in self.profiles:
             profile.save(path, make_folder=True, make_visualizer_file=make_visualizer_files)
 
-if __name__ == "__main__":
+def run():
     try:
         os.system("taskkill /f /im chrome.exe")
     except:
@@ -45,3 +45,6 @@ if __name__ == "__main__":
                 warn(f"Profiler of {user_name} failed:\n{e}")
         else:
             warn(f"User Data path of {user_name} doesn't exist.")
+
+if __name__ == "__main__":
+    run()
